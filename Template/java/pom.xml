@@ -8,8 +8,8 @@
         <version>2.3.0.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.techelevator</groupId>
-    <artifactId>player-tracker-1</artifactId>
+    <groupId>com.openTee</groupId>
+    <artifactId>openTee</artifactId>
     <version>1.0</version>
 
     <properties>
@@ -76,6 +76,17 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>net.sourceforge.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <version>2.60.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.13.2.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>

@@ -1,6 +1,6 @@
 BEGIN TRANSACTION;
 
-DROP TABLE IF EXISTS users, teams, players, positions, player_position CASCADE;
+DROP TABLE IF EXISTS courses, links, users CASCADE;
 DROP SEQUENCE IF EXISTS seq_user_id;
 
 CREATE SEQUENCE seq_user_id
@@ -10,46 +10,30 @@ CREATE SEQUENCE seq_user_id
   NO MINVALUE
   CACHE 1;
 
-  CREATE TABLE teams
-(
-   team_id serial,
-   name varchar(25) NOT NULL,
 
-   constraint pk_team_id primary key (team_id)
+CREATE TABLE courses
+(
+  course_id serial,
+  course_name varchar(100) NOT NULL,
+
+  constraint pk_course_id primary key (course_id)
+
 );
 
-CREATE TABLE players
+
+
+  CREATE TABLE links
 (
-  player_id serial,
-  firstName varchar(25) NOT NULL,
-  lastName varchar(25) NOT NULL,
-  jerseyNumber int NOT NULL,
-  salary NUMERIC(12,2) NOT NULL,
-  team_id int,
-  image_url varchar(500),
-  
-  constraint pk_player_id primary key (player_id),
-  constraint fk_team_id foreign key (team_id) references teams (team_id)
- 	
+   link_id serial,
+   link varchar(200) NOT NULL,
+   course_id int,
+
+   constraint pk_link_id primary key (link_id),
+   constraint fk_course_id foreign key (course_id) references courses (course_id)
 );
 
-CREATE TABLE positions 
-(
-  position_id serial,
-  positionName VARCHAR(25),
 
-  constraint pk_position_id primary key (position_id) 
-);
 
-CREATE TABLE player_position
-(
-	player_id int,
-    position_id int, 
-	
-    constraint pk_player_id_position_id primary key (player_id, position_id),
-	constraint fk_player_id foreign key (player_id) references players (player_id),
-    constraint fk_position_id foreign key (position_id) references positions (position_id)
-);
 
 
 CREATE TABLE users (
@@ -59,5 +43,5 @@ CREATE TABLE users (
 	role varchar(50) NOT NULL,
 	CONSTRAINT PK_user PRIMARY KEY (user_id)
 );
-
+--ROLLBACK;
 COMMIT TRANSACTION;

@@ -1,49 +1,89 @@
 package com.techelevator.dao;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.techelevator.exception.DaoException;
-import com.techelevator.model.Player;
+import com.techelevator.model.TeeTime;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Component
-public class JdbcPlayerDao implements PlayerDAO{
+public class JdbcTeeTimeDao implements TeeTimeDao {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public JdbcPlayerDao(JdbcTemplate jdbcTemplate) {
+    public JdbcTeeTimeDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
     @Override
-    public List<Player> fetchAllPLayers() {
+    public List<TeeTime> fetchAllTeeTimes() {
 
-        List<Player> players = new ArrayList<>();
-        String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players";
-        try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-            while  (results.next()) {
-                Player player = mapRowToPlayer(results);
+        List<TeeTime> teeTimes = new ArrayList<>();
 
-                //this calls private method below to retrieve List<String> positions. Broke out so I can reuse later
-                player.setPositions(retrievePositions(player.getPlayerId()));
+        String searchQuery;
+        List<String> searchUrls = new ArrayList<>();
 
-                players.add(player);
+
+
+
+        try{
+
+            for(String url : searchUrls){
+                WebClient client = new WebClient();
+                HtmlPage page = client.getPage(url);
+
+
+
+
+
+
+
             }
-        } catch (CannotGetJdbcConnectionException e) {
-            throw new DaoException("Unable to connect to server or database", e);
+
+
+
+
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return players;
+
+
+//        String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players";
+//        try {
+//            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+//            while  (results.next()) {
+//                TeeTime teeTime = mapRowToPlayer(results);
+//
+//                //this calls private method below to retrieve List<String> positions. Broke out so I can reuse later
+//                teeTime.setPositions(retrievePositions(teeTime.getPlayerId()));
+//
+//                teeTimes.add(teeTime);
+//            }
+//        } catch (CannotGetJdbcConnectionException e) {
+//            throw new DaoException("Unable to connect to server or database", e);
+//        }
+        return teeTimes;
     }
 
     @Override
-    public Player fetchPlayerByPlayerId(int playerId) {
+    public TeeTime fetchPlayerByPlayerId(int playerId) {
+        return null;
+    }
 
-        Player player = null;
+    @Override
+    public TeeTime fetchTeeTimes() {
+
+        TeeTime teeTime = null;
         String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players " +
                      " WHERE player_id = ?";
 
@@ -51,25 +91,25 @@ public class JdbcPlayerDao implements PlayerDAO{
             SqlRowSet results = jdbcTemplate.queryForRowSet(sql, playerId);
 
             if  (results.next()) {
-                 player = mapRowToPlayer(results);
+                 teeTime = mapRowToPlayer(results);
 
                 //this calls private method below to retrieve List<String> positions. Broke out so I can reuse later
-                player.setPositions(retrievePositions(player.getPlayerId()));
+                teeTime.setPositions(retrievePositions(teeTime.getPlayerId()));
 
             }
         } catch (CannotGetJdbcConnectionException e) {
             throw new DaoException("Unable to connect to server or database", e);
         }
-        return player;
+        return teeTime;
     }
 
     @Override
-    public Player addPLayer(Player newPlayer) {
+    public TeeTime addPLayer(TeeTime newTeeTime) {
 
         //insert into players table
         String player_table_sql = "INSERT INTO players (firstname, lastname, jerseynumber, salary, team_id, image_url) VALUES (?, ?, ?, ?, ?, ?) RETURNING player_id";
-        int new_id = jdbcTemplate.queryForObject(player_table_sql, int.class, newPlayer.getFirstName(), newPlayer.getLastName(), newPlayer.getJerseyNumber(), newPlayer.getSalary(), newPlayer.getTeamId(), newPlayer.getImageUrl());
-        newPlayer.setPlayerId(new_id);
+        int new_id = jdbcTemplate.queryForObject(player_table_sql, int.class, newTeeTime.getFirstName(), newTeeTime.getLastName(), newTeeTime.getJerseyNumber(), newTeeTime.getSalary(), newTeeTime.getTeamId(), newTeeTime.getImageUrl());
+        newTeeTime.setPlayerId(new_id);
 
         //insert into positions table
         //TODO (Lot of work so skipping. We need to make sure the front end picks from a list )
@@ -79,20 +119,20 @@ public class JdbcPlayerDao implements PlayerDAO{
 
 
 
-        return newPlayer;
+        return newTeeTime;
     }
 
     @Override
-    public Player updatePlayer(Player updatedPlayer) {
+    public TeeTime updatePlayer(TeeTime updatedTeeTime) {
         String sql = "UPDATE players SET firstname = ?, lastname = ?, jerseynumber = ?, salary = ?, team_id = ? " +
                      "WHERE player_id = ?";
 
-        int rowCount = jdbcTemplate.update(sql, updatedPlayer.getFirstName(), updatedPlayer.getLastName(), updatedPlayer.getJerseyNumber(), updatedPlayer.getSalary(), updatedPlayer.getTeamId(), updatedPlayer.getPlayerId());
+        int rowCount = jdbcTemplate.update(sql, updatedTeeTime.getFirstName(), updatedTeeTime.getLastName(), updatedTeeTime.getJerseyNumber(), updatedTeeTime.getSalary(), updatedTeeTime.getTeamId(), updatedTeeTime.getPlayerId());
 
         if (rowCount < 1) {
             throw new DaoException("Error. Player was not updated.");
         }
-        return updatedPlayer;
+        return updatedTeeTime;
     }
 
     @Override
@@ -111,16 +151,12 @@ public class JdbcPlayerDao implements PlayerDAO{
 
 
 
-    private Player mapRowToPlayer(SqlRowSet rowSet) {
-        Player player = new Player();
-        player.setPlayerId(rowSet.getInt("player_id"));
-        player.setFirstName(rowSet.getString("firstname"));
-        player.setLastName(rowSet.getString("lastname"));
-        player.setJerseyNumber(rowSet.getInt("jerseynumber"));
-        player.setSalary(rowSet.getDouble("salary"));
-        player.setTeamId(rowSet.getInt("team_id"));
-        player.setImageUrl(rowSet.getString("image_url"));
-        return player;
+    private TeeTime mapScrapeToTeeTime() {
+        TeeTime teeTime = new TeeTime();
+        teeTime.setTeeTimeId(0);
+        teeTime.setCourseName(null);
+        teeTime.setTime(null);
+        return teeTime;
     }
 
     private List<String> retrievePositions(int playerId) {

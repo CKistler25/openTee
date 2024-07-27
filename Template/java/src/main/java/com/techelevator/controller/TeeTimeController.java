@@ -1,8 +1,8 @@
 package com.techelevator.controller;
 
 
-import com.techelevator.dao.PlayerDAO;
-import com.techelevator.model.Player;
+import com.techelevator.dao.TeeTimeDao;
+import com.techelevator.model.TeeTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -12,10 +12,10 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-public class PlayerController {
+public class TeeTimeController {
 
     @Autowired
-    private PlayerDAO dao;
+    private TeeTimeDao dao;
 
     @ResponseStatus(HttpStatus.I_AM_A_TEAPOT)
     @RequestMapping(path = "/heartbeat", method= RequestMethod.GET)
@@ -24,29 +24,29 @@ public class PlayerController {
     }
 
     @RequestMapping(path = "/players", method= RequestMethod.GET)
-    public List<Player> fetchAllPlayers() {
+    public List<TeeTime> fetchAllPlayers() {
         return dao.fetchAllPLayers();
     }
 
     @RequestMapping(path = "/players/{id}", method= RequestMethod.GET)
-    public Player fetchPlayerById(@PathVariable int id) {
-        Player foundPlayer = dao.fetchPlayerByPlayerId(id);
-        if (foundPlayer == null) {
+    public TeeTime fetchPlayerById(@PathVariable int id) {
+        TeeTime foundTeeTime = dao.fetchPlayerByPlayerId(id);
+        if (foundTeeTime == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
-        return foundPlayer;
+        return foundTeeTime;
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "/players", method= RequestMethod.POST)
-    public Player addNewPlayer(@Valid @RequestBody Player newPlayer) {
-        return dao.addPLayer(newPlayer);
+    public TeeTime addNewPlayer(@Valid @RequestBody TeeTime newTeeTime) {
+        return dao.addPLayer(newTeeTime);
     }
 
 
     @RequestMapping(path = "/players", method= RequestMethod.PUT)
-    public Player updatePlayer(@Valid @RequestBody Player updatedPlayer) {
-        return dao.updatePlayer(updatedPlayer);
+    public TeeTime updatePlayer(@Valid @RequestBody TeeTime updatedTeeTime) {
+        return dao.updatePlayer(updatedTeeTime);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
