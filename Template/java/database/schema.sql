@@ -25,7 +25,7 @@ CREATE TABLE courses
   CREATE TABLE links
 (
    link_id serial,
-   link varchar(200) NOT NULL,
+   link_url varchar(500) NOT NULL,
    course_id int,
 
    constraint pk_link_id primary key (link_id),

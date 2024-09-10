@@ -1,24 +1,47 @@
 package com.techelevator.dao;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+
+
+
+import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.AriaRole;
 import com.techelevator.exception.DaoException;
 import com.techelevator.model.TeeTime;
+
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
+
 
 @Component
 public class JdbcTeeTimeDao implements TeeTimeDao {
 
     private final JdbcTemplate jdbcTemplate;
+
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    private String authToken = null;
+
+    public void setAuthToken(String authToken) {
+        this.authToken = authToken;
+    }
 
     public JdbcTeeTimeDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -27,19 +50,99 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
     @Override
     public List<TeeTime> fetchAllTeeTimes() {
 
+
         List<TeeTime> teeTimes = new ArrayList<>();
+
+
+        //Populate list of tee time links
+
+        String sql = "SELECT link_url FROM links";
+
 
         String searchQuery;
         List<String> searchUrls = new ArrayList<>();
 
 
-
-
         try{
 
-            for(String url : searchUrls){
-                WebClient client = new WebClient();
-                HtmlPage page = client.getPage(url);
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
+            while (results.next()) {
+                searchUrls.add(results.getString("link_url"));
+            }
+
+
+
+        } catch (DaoException e) {
+            throw new DaoException(e.getMessage());
+        }
+
+
+                //Loop through links and make Call and then add to tee time object
+                try (Playwright playwright = Playwright.create()) {
+                    Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setTimeout(3000));
+
+                    for (String url : searchUrls) {
+                        Page page = browser.newPage();
+                        page.navigate(url);
+
+                        // Click the button if it is present
+                        page.locator("//button[text()='Public']").or(page.locator("//button[text()='PUBLIC Online Tee Times']"))
+                                .or(page.locator("//button[text()='Public Tee Times']"))
+                                .or(page.locator("//button[text()='Online Booking']"))
+                                .click();
+
+
+
+
+                        // Wait for the necessary elements to be loaded
+
+                        page.waitForSelector(".time"); // Replace with actual selector
+
+                            // Scrape data from the page
+                            List<Locator> elements = page.locator(".time").all(); // Replace with actual selector
+
+                            for (Locator element : elements) {
+                                TeeTime teeTime = new TeeTime();
+
+                                String time = element.locator(".times-booking-start-time-label").or(element.locator(".booking-start-time-label")).innerText(); // Replace with actual selector
+                                String price = element.getByTitle("Green Fee").innerText(); // Replace with actual selector
+                                String holes = element.locator(".time-summary-ob-holes-full-text").or(element.locator(".booking-slot-holes"))
+                                        .or(element.locator(".time-summary-ob-holes-half-dark").first())
+                                        .innerText();
+                                //Temp Name
+                                //String courseName = element.locator(".times-booking-teesheet-name").or(element.locator("a.navbar-brand")).textContent();// Replace with actual selector
+                                String courseName = getCourseNameByUrl(url);
+                                teeTime.setTime(time);
+                                teeTime.setPrice(price);
+                                teeTime.setHoles(holes);
+                                teeTime.setBookingUrl(url);
+                                teeTime.setCourseName(courseName); // Adjust as needed to extract the actual course name
+
+                                teeTimes.add(teeTime);
+                            }
+
+                            System.out.println("Processed URL: " + url);
+                            page.close();
+
+                    }
+
+
+                    browser.close();
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Process the scraped data as needed
+                for (TeeTime teeTime : teeTimes) {
+                    System.out.println(teeTime.getTime());
+                }
+
+
+
+                    return teeTimes;
+
 
 
 
@@ -50,12 +153,31 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
             }
 
 
+            private String getCourseNameByUrl(String url) {
+            String courseName = "";
+
+            String sql = "SELECT course_name FROM courses WHERE course_id = (SELECT course_id FROM links WHERE link_url = ?);";
+
+                try{
+
+                    SqlRowSet results = jdbcTemplate.queryForRowSet(sql, url);
+                    if (results.next()) {
+                        courseName = results.getString("course_name");
+                    }
 
 
 
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+                } catch (DaoException e) {
+                    throw new DaoException(e.getMessage());
+                }
+
+
+            return courseName;
+            }
+
+
+
+
 
 
 //        String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players";
@@ -72,106 +194,16 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
 //        } catch (CannotGetJdbcConnectionException e) {
 //            throw new DaoException("Unable to connect to server or database", e);
 //        }
-        return teeTimes;
-    }
-
-    @Override
-    public TeeTime fetchPlayerByPlayerId(int playerId) {
-        return null;
-    }
-
-    @Override
-    public TeeTime fetchTeeTimes() {
-
-        TeeTime teeTime = null;
-        String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players " +
-                     " WHERE player_id = ?";
-
-        try {
-            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, playerId);
-
-            if  (results.next()) {
-                 teeTime = mapRowToPlayer(results);
-
-                //this calls private method below to retrieve List<String> positions. Broke out so I can reuse later
-                teeTime.setPositions(retrievePositions(teeTime.getPlayerId()));
-
-            }
-        } catch (CannotGetJdbcConnectionException e) {
-            throw new DaoException("Unable to connect to server or database", e);
-        }
-        return teeTime;
-    }
-
-    @Override
-    public TeeTime addPLayer(TeeTime newTeeTime) {
-
-        //insert into players table
-        String player_table_sql = "INSERT INTO players (firstname, lastname, jerseynumber, salary, team_id, image_url) VALUES (?, ?, ?, ?, ?, ?) RETURNING player_id";
-        int new_id = jdbcTemplate.queryForObject(player_table_sql, int.class, newTeeTime.getFirstName(), newTeeTime.getLastName(), newTeeTime.getJerseyNumber(), newTeeTime.getSalary(), newTeeTime.getTeamId(), newTeeTime.getImageUrl());
-        newTeeTime.setPlayerId(new_id);
-
-        //insert into positions table
-        //TODO (Lot of work so skipping. We need to make sure the front end picks from a list )
-
-        //insert into player_position table
-        //TODO
-
-
-
-        return newTeeTime;
-    }
-
-    @Override
-    public TeeTime updatePlayer(TeeTime updatedTeeTime) {
-        String sql = "UPDATE players SET firstname = ?, lastname = ?, jerseynumber = ?, salary = ?, team_id = ? " +
-                     "WHERE player_id = ?";
-
-        int rowCount = jdbcTemplate.update(sql, updatedTeeTime.getFirstName(), updatedTeeTime.getLastName(), updatedTeeTime.getJerseyNumber(), updatedTeeTime.getSalary(), updatedTeeTime.getTeamId(), updatedTeeTime.getPlayerId());
-
-        if (rowCount < 1) {
-            throw new DaoException("Error. Player was not updated.");
-        }
-        return updatedTeeTime;
-    }
-
-    @Override
-    public void deletePlayer(int playerId){
-
-        //TODO Handle exceptions properly...
-
-        // SQL TO REMOVE FROM JOIN TABLE AND PLAYER TABLE
-        String sql2 = "DELETE FROM player_position WHERE player_id = ?";
-        String sql3 = "DELETE FROM players WHERE player_id = ?";
-
-        jdbcTemplate.update(sql2, playerId);
-        jdbcTemplate.update(sql3, playerId);
 
     }
 
 
 
-    private TeeTime mapScrapeToTeeTime() {
-        TeeTime teeTime = new TeeTime();
-        teeTime.setTeeTimeId(0);
-        teeTime.setCourseName(null);
-        teeTime.setTime(null);
-        return teeTime;
-    }
 
-    private List<String> retrievePositions(int playerId) {
-        List<String> positions = new ArrayList<>();
+//    private HttpEntity<Void> makeAuthEntity() {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setBearerAuth(authToken);
+//        return new HttpEntity<>(headers);
+//    }
 
-        String sql = "SELECT positions.positionName FROM player_position " +
-                "JOIN positions ON player_position.position_id = positions.position_id " +
-                "WHERE player_id = ?";
-        SqlRowSet pos_results = jdbcTemplate.queryForRowSet(sql, playerId);
 
-        while (pos_results.next()) {
-            positions.add(pos_results.getString("positionName"));
-        }
-
-        return positions;
-    }
-
-}

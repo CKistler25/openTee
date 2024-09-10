@@ -9,33 +9,37 @@ import java.util.List;
 
 public class TeeTime {
 
-    private int teeTimeId;    // player id is the internal id (emp id) NOT jersey number
-    @NotBlank(message = "You need to include a courseName you big dummy")
+    private String time;
+
     private String courseName;
-    @NotBlank(message = "You need to include a time you big dummy")
-    private LocalDateTime time;
-    private int availablePlayers;
+
+    private String holes;
+
+    private String price;
+    private String bookingUrl;
 
 
+    // Default constructor
     public TeeTime() {
-
     }
 
-    public TeeTime(int teeTimeId, String courseName, LocalDateTime time, int availablePlayers) {
-        this.teeTimeId = teeTimeId;
-        this.courseName = courseName;
+    // Custom constructor with all fields
+
+
+    public TeeTime(String time, String courseName, String holes, String price, String bookingUrl) {
         this.time = time;
-        this.availablePlayers = availablePlayers;
+        this.courseName = courseName;
+        this.holes = holes;
+        this.price = price;
+        this.bookingUrl = bookingUrl;
     }
 
-
-
-    public int getTeeTimeId() {
-        return teeTimeId;
+    public String getTime() {
+        return time;
     }
 
-    public void setTeeTimeId(int teeTimeId) {
-        this.teeTimeId = teeTimeId;
+    public void setTime(String time) {
+        this.time = time;
     }
 
     public String getCourseName() {
@@ -46,19 +50,27 @@ public class TeeTime {
         this.courseName = courseName;
     }
 
-    public LocalDateTime getTime() {
-        return time;
+    public String getHoles() {
+        return holes;
     }
 
-    public void setTime(LocalDateTime time) {
-        this.time = time;
+    public void setHoles(String holes) {
+        this.holes = holes;
     }
 
-    public int getAvailablePlayers() {
-        return availablePlayers;
+    public String getPrice() {
+        return price;
     }
 
-    public void setAvailablePlayers(int availablePlayers) {
-        this.availablePlayers = availablePlayers;
+    public void setPrice(String price) {
+        this.price = price;
+    }
+
+    public String getBookingUrl() {
+        return bookingUrl;
+    }
+
+    public void setBookingUrl(String bookingUrl) {
+        this.bookingUrl = bookingUrl;
     }
 }

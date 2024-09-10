@@ -19,6 +19,7 @@ INSERT INTO courses (course_name) VALUES ('Wilson Road');
 INSERT INTO courses (course_name) VALUES ('Turnberry');
 INSERT INTO courses (course_name) VALUES ('Cumberland Trail');
 INSERT INTO courses (course_name) VALUES ('Deleware Golf Club');
+INSERT INTO courses (course_name) VALUES ('Safari Golf Club');
 
 
 --populate links
@@ -34,8 +35,7 @@ INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/inde
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21526/8135#teetimes', 10);
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21524/8253#teetimes', 11);
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21525/8204#teetimes', 12);
-INSERT INTO links (link_url, course_id) VALUES ('', 13);
-INSERT INTO links (link_url, course_id) VALUES ('', 14);
+INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/22036/9668#/teetimes', 15);
 
 
 
