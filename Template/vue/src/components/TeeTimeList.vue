@@ -1,19 +1,22 @@
 <template>
     <div class="main">
+      
       <button v-on:click="getTeeTimes" v-show="showButton">Get Tee Times</button>
-  
+      <PageLoader v-show="loaded == false"/>  
       <!-- Sort Options as clickable links -->
       
   
       <!-- Display sorted tee times as cards in grid -->
       <div class="grid-container">
         <div class="teeTimeContainer" v-for="teeTime in sortedTeeTimes" :key="teeTime.time">
-          <div class="card">
+          <a v-bind:href="teeTime.bookingUrl" target="_blank">
+          <div class="card" >
             <div class="time">{{ teeTime.time }}</div>
             <div class="course-name">{{ teeTime.courseName }}</div>
             <div class="holes">{{ teeTime.holes }} holes</div>
             <div class="price">{{ teeTime.price }}</div>
           </div>
+        </a>
         </div>
       </div>
     </div>
@@ -21,22 +24,29 @@
   
   <script>
   import TeeTimeService from "../services/TeeTimeService";
+  import PageLoader from "./PageLoader.vue";
   
   export default {
+    components:{
+      PageLoader
+    },
     data() {
       return {
         teeTimes: [], // Array to hold fetched tee times
         showButton: true, // Flag to show or hide the button
         sortOption: "earliest", // Default sorting option
+        loaded: true,
       };
     },
     methods: {
       // Fetch tee times from the service
       getTeeTimes() {
         this.showButton = false;
+        this.loaded = false;
         TeeTimeService.fetchAllTeeTimes()
           .then((response) => {
             this.teeTimes = [...response.data];
+            this.loaded = true;
           })
           .catch((error) => {
             console.log(error);
@@ -60,7 +70,14 @@
       sortedTeeTimes() {
         return this.sortBookingsByTime(); // Return the sorted array
       }
+    },
+    mounted() {
+    document.onreadystatechange = () => {
+      if (document.readyState == "complete") {
+        this.loaded = true;
+      }
     }
+  },
   };
   </script>
 
@@ -75,11 +92,13 @@
     text-align: center;
 }
 
-.main{
+.main {
     display: flex;
-    justify-content: center;
-    text-align: center;
+    flex-direction: column; /* Align items vertically */
+    justify-content: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
     width: 80%;
+    text-align: center; /* Center text within the button */
 }
 
 /* TeeTime Card Grid */

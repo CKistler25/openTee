@@ -5,6 +5,7 @@ package com.techelevator.dao;
 
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
 import com.techelevator.exception.DaoException;
 import com.techelevator.model.TeeTime;
 
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import java.util.HashMap;
@@ -79,14 +81,17 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
 
                 //Loop through links and make Call and then add to tee time object
                 try (Playwright playwright = Playwright.create()) {
-                    Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false).setTimeout(3000));
+                    Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(true).setTimeout(3000).setSlowMo(300));
 
                     for (String url : searchUrls) {
-                        Page page = browser.newPage();
+                        Page page = browser.newPage(new Browser.NewPageOptions().setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0"));
                         page.navigate(url);
+                        page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("screenshot.png")));
+
 
                         // Click the button if it is present
-                        page.locator("//button[text()='Public']").or(page.locator("//button[text()='PUBLIC Online Tee Times']"))
+                        page.locator("//button[text()='Public']")
+                                .or(page.locator("//button[text()='PUBLIC Online Tee Times']"))
                                 .or(page.locator("//button[text()='Public Tee Times']"))
                                 .or(page.locator("//button[text()='Online Booking']"))
                                 .click();
@@ -96,8 +101,8 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
 
                         // Wait for the necessary elements to be loaded
 
-                        page.waitForSelector(".time"); // Replace with actual selector
-
+                        //page.waitForSelector(".time"); // Replace with actual selector
+                        page.waitForLoadState(LoadState.NETWORKIDLE);
                             // Scrape data from the page
                             List<Locator> elements = page.locator(".time").all(); // Replace with actual selector
 

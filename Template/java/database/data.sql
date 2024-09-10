@@ -33,8 +33,8 @@ INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/inde
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21523/8148#teetimes', 8);
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21527/8209#teetimes', 9);
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21526/8135#teetimes', 10);
-INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21524/8253#teetimes', 11);
-INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21525/8204#teetimes', 12);
+INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21525/8204#teetimes', 11);
+--INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/21524/8253#/teetimes', 12);
 INSERT INTO links (link_url, course_id) VALUES ('https://foreupsoftware.com/index.php/booking/22036/9668#/teetimes', 15);
 
 
