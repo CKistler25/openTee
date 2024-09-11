@@ -1,15 +1,13 @@
 <template>
-  <div>
-  <the-header/>
-  <div>
-    
-  <!-- <h1>Home</h1> -->
-  <div class="list">
-    <TeeTimeList />
+  <div class="container">
+    <the-header />
+    <div class="content">
+      <div class="listItems">
+        <TeeTimeList />
+      </div>
+    </div>
+    <the-footer />
   </div>
-</div>
-<the-footer />
-</div>
 </template>
 
 <script>
@@ -35,19 +33,36 @@ components:{
 };
 </script>
 <style scoped>
-.list {
+/* Set the container to be a flexbox and take the full viewport height */
+.container {
   display: flex;
-  flex-direction: column; /* Center items vertically */
-  align-items: center; /* Center items horizontally */
-  justify-content: flex-start; /* Center items vertically */
-  height: 100vh; /* Full viewport height */
-  margin: 0; /* Remove default margin */
-  padding: 0; /* Remove default padding if needed */
-  box-sizing: border-box; /* Ensure padding/margin does not affect height */
+  flex-direction: column;
+  min-height: 100vh;
+  min-width: 100vw; /* Ensures the container takes the full height of the viewport */
+  padding: 0%;
 }
 
-h1 {
-  margin: 0; /* Remove default margin */
+/* Ensure the content takes up all available space between header and footer */
+.content {
+  flex: 1; /* This will push the footer to the bottom */
+  display: flex;
+  justify-content: center; /* Center the content horizontally if needed */
+  align-items: flex-start; /* Align the content at the top */
+}
+
+.listItems {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+the-footer {
+  /* Optional footer styling */
+  background-color: #f1f1f1;
   text-align: center;
+  padding: 1rem;
+  width: 100%;
+  
 }
 </style>

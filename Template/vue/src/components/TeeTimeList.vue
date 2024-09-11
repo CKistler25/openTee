@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main-times-sheet">
     <label for="datePicker">Select a Date to Search Tee Times: </label>
     <input
       type="date"
@@ -20,14 +20,29 @@
         v-for="teeTime in sortedTeeTimes"
         :key="teeTime.time"
       >
-        <a v-bind:href="teeTime.bookingUrl" target="_blank">
-          <div class="card">
+        <!-- <a v-bind:href="teeTime.bookingUrl" target="_blank">
+        </a> -->
+          <!-- <div class="card-times">
             <div class="time">{{ teeTime.time }}</div>
             <div class="course-name">{{ teeTime.courseName }}</div>
             <div class="holes">{{ teeTime.holes }} holes</div>
             <div class="price">{{ teeTime.price }}</div>
+          </div> -->
+
+
+          <div class="card" style="width: 18rem">
+            <img v-bind:src="teeTime.thumbnailUrl" class="card-img-top" alt="..." />
+            <div class="card-body">
+              <h5 class="card-title">{{teeTime.courseName}}</h5>
+              <div class="card-text">
+                <h5>{{ teeTime.time }}</h5>
+                <p>{{ teeTime.holes }}</p>
+                <h6>{{ teeTime.price }}</h6>
+              </div>
+              <a v-bind:href="teeTime.bookingUrl" class="btn btn-primary" target="_blank">Book Here</a>
+            </div>
           </div>
-        </a>
+        
       </div>
     </div>
   </div>
@@ -103,14 +118,13 @@ export default {
   },
   mounted() {
     this.dateSelector = this.getDate();
-    
+
     document.onreadystatechange = () => {
       if (document.readyState == "complete") {
         this.loaded = true;
       }
     };
   },
-  
 };
 </script>
 
@@ -124,7 +138,7 @@ export default {
   text-align: center;
 }
 
-.main {
+.main-times-sheet {
   display: flex;
   flex-direction: column; /* Align items vertically */
   justify-content: center; /* Center items horizontally */
@@ -145,7 +159,7 @@ export default {
 }
 
 /* Card Styles */
-.card {
+.card-times {
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);

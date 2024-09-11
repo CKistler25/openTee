@@ -45,8 +45,8 @@ export default {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
-  background-color: #15a90196;
+  height: 100%;
+  background-color: #387f0896;
   z-index: 999;
 }
 .loader-container {

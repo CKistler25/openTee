@@ -128,11 +128,13 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
                                 //Temp Name
                                 //String courseName = element.locator(".times-booking-teesheet-name").or(element.locator("a.navbar-brand")).textContent();// Replace with actual selector
                                 String courseName = getCourseNameByUrl(url);
+                                String courseThumbnail = getCourseThumbnailByUrl(url);
                                 teeTime.setTime(time);
                                 teeTime.setPrice(price);
                                 teeTime.setHoles(holes);
                                 teeTime.setBookingUrl(url);
-                                teeTime.setCourseName(courseName); // Adjust as needed to extract the actual course name
+                                teeTime.setCourseName(courseName);
+                                teeTime.setThumbnailUrl(courseThumbnail);// Adjust as needed to extract the actual course name
 
                                 teeTimes.add(teeTime);
                             }
@@ -191,25 +193,28 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
             return courseName;
             }
 
+    private String getCourseThumbnailByUrl(String url) {
+        String courseThumbnail= "";
+
+        String sql = "SELECT thumbnail FROM courses WHERE course_id = (SELECT course_id FROM links WHERE link_url = ?);";
+
+        try{
+
+            SqlRowSet results = jdbcTemplate.queryForRowSet(sql, url);
+            if (results.next()) {
+                courseThumbnail = results.getString("thumbnail");
+            }
 
 
 
+        } catch (DaoException e) {
+            throw new DaoException(e.getMessage());
+        }
 
 
-//        String sql = "SELECT player_id, firstname, lastname, jerseynumber, salary, team_id, image_url FROM players";
-//        try {
-//            SqlRowSet results = jdbcTemplate.queryForRowSet(sql);
-//            while  (results.next()) {
-//                TeeTime teeTime = mapRowToPlayer(results);
-//
-//                //this calls private method below to retrieve List<String> positions. Broke out so I can reuse later
-//                teeTime.setPositions(retrievePositions(teeTime.getPlayerId()));
-//
-//                teeTimes.add(teeTime);
-//            }
-//        } catch (CannotGetJdbcConnectionException e) {
-//            throw new DaoException("Unable to connect to server or database", e);
-//        }
+        return courseThumbnail;
+    }
+
 
 
 

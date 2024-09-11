@@ -11,6 +11,7 @@ public class TeeTime {
 
     private String price;
     private String bookingUrl;
+    private String thumbnailUrl;
 
 
     // Default constructor
@@ -20,12 +21,13 @@ public class TeeTime {
     // Custom constructor with all fields
 
 
-    public TeeTime(String time, String courseName, String holes, String price, String bookingUrl) {
+    public TeeTime(String time, String courseName, String holes, String price, String bookingUrl, String thumbnailUrl) {
         this.time = time;
         this.courseName = courseName;
         this.holes = holes;
         this.price = price;
         this.bookingUrl = bookingUrl;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public String getTime() {
@@ -66,5 +68,13 @@ public class TeeTime {
 
     public void setBookingUrl(String bookingUrl) {
         this.bookingUrl = bookingUrl;
+    }
+
+    public String getThumbnailUrl() {
+        return thumbnailUrl;
+    }
+
+    public void setThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 }

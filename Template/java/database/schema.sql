@@ -15,6 +15,7 @@ CREATE TABLE courses
 (
   course_id serial,
   course_name varchar(100) NOT NULL,
+  thumbnail varchar(150) NOT NULL,
 
   constraint pk_course_id primary key (course_id)
 

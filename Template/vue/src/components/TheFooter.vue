@@ -4,10 +4,10 @@
       <div class="footer-content">
         <h3>Connect with Us</h3>
         <div class="social-icons">
-          <a href="https://www.github.com/" target="_blank" rel="noopener noreferrer">
+          <a href="https://github.com/CKistler25" target="_blank" rel="noopener noreferrer">
             <i class="fa-brands fa-github fa-2xl"></i>
           </a>
-          <a href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">
+          <a href="https://www.linkedin.com/in/carter-kistler/" target="_blank" rel="noopener noreferrer">
             <i class="fa-brands fa-linkedin fa-2xl"></i>
           </a>
         </div>
@@ -32,7 +32,8 @@
   .footer-container {
     background-color: #333;
     color: white;
-    padding: 20px;
+    padding-top: .3rem;
+    padding-bottom: .1rem;
     text-align: center;
   }
   
@@ -40,17 +41,17 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 20px;
+    margin-bottom: .5rem;
   }
   
   .footer-content h3 {
-    margin-bottom: 20px;
+    margin-bottom: .5rem;
     font-size: 1.5rem;
   }
   
   .social-icons {
     display: flex;
-    gap: 15px;
+    gap: 1rem;
   }
   
   .social-icons a {
@@ -59,7 +60,7 @@
   }
   
   .social-icons a:hover {
-    color: #007bff; /* Change to your theme color */
+    color: #709909ba; /* Change to your theme color */
   }
   
   .footer-bottom {
