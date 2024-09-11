@@ -25,8 +25,11 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,8 +53,13 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
     }
 
     @Override
-    public List<TeeTime> fetchAllTeeTimes() {
+    public List<TeeTime> fetchAllTeeTimes(String date) {
 
+
+
+        int day = stripDayFromDate(date);
+
+        int today = LocalDate.now().getDayOfMonth();
 
         List<TeeTime> teeTimes = new ArrayList<>();
 
@@ -85,6 +93,8 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
 
                     for (String url : searchUrls) {
                         Page page = browser.newPage(new Browser.NewPageOptions().setUserAgent("Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:109.0) Gecko/20100101 Firefox/109.0"));
+//                        SimpleDateFormat format = new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss");
+//                        page.clock().install(new Clock.InstallOptions().setTime(format.parse("2024-09-14T02:00:00")));
                         page.navigate(url);
                         page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("screenshot.png")));
 
@@ -104,6 +114,21 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
                         //page.waitForSelector(".time"); // Replace with actual selector
                         page.waitForLoadState(LoadState.NETWORKIDLE);
                             // Scrape data from the page
+
+
+                        if(day != today){
+                          page.locator("//td[text()='" + day +"']").click();
+                          //THINGS THAT DON'T WORK
+                          //page.waitForCondition(() -> page.locator(".time").isHidden(), new Page.WaitForConditionOptions().setTimeout(1000));
+
+                            //GENERALLY BAD PRACTICE. NEED A BETTER WAY TO HANDLE THIS
+                            page.waitForTimeout(1000);
+
+
+                        }
+
+
+
                             List<Locator> elements = page.locator(".time").all(); // Replace with actual selector
 
                             for (Locator element : elements) {
@@ -199,6 +224,27 @@ public class JdbcTeeTimeDao implements TeeTimeDao {
 //        } catch (CannotGetJdbcConnectionException e) {
 //            throw new DaoException("Unable to connect to server or database", e);
 //        }
+
+
+
+   private int stripDayFromDate(String date) {
+        // Check if the date is in the expected format
+        if (date == null || date.length() != 10) {
+            throw new IllegalArgumentException("Invalid date format. Expected format: yyyy-mm-dd");
+        }
+
+        // Split the date string by the hyphen
+        String[] parts = date.split("-");
+
+
+        // Return only the year and month
+        int day = Integer.parseInt(parts[2]);
+
+        return day;
+
+    }
+
+
 
     }
 

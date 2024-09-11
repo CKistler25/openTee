@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TeeTimeDao {
 
-        public List<TeeTime> fetchAllTeeTimes();
+        public List<TeeTime> fetchAllTeeTimes(String date);
 
         
 

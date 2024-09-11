@@ -26,9 +26,9 @@ public class TeeTimeController {
         return "deh-dump!";
     }
 
-    @RequestMapping(path = "/times", method= RequestMethod.GET)
-    public List<TeeTime> fetchAllTimes() {
-        return dao.fetchAllTeeTimes();
+    @GetMapping(path = "/times/{date}")
+    public List<TeeTime> fetchAllTimes(@PathVariable("date") String date) {
+        return dao.fetchAllTeeTimes(date);
     }
 //
 //    @RequestMapping(path = "/players/{id}", method= RequestMethod.GET)

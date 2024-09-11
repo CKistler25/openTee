@@ -2,8 +2,8 @@ import axios from 'axios';
 
 export default {
 
-  fetchAllTeeTimes(){
-    return axios.get('/times');
+  fetchAllTeeTimes(date){
+    return axios.get(`/times/${date}`);
   },
 
 }

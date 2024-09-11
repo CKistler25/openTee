@@ -1,6 +1,7 @@
 <template>
     <div class="main">
-      
+      <label for="datePicker">Select a Date to Search Tee Times: </label>
+      <input type="date" id="datePicker" v-model="dateSelector">
       <button v-on:click="getTeeTimes" v-show="showButton">Get Tee Times</button>
       <PageLoader v-show="loaded == false"/>  
       <!-- Sort Options as clickable links -->
@@ -36,6 +37,7 @@
         showButton: true, // Flag to show or hide the button
         sortOption: "earliest", // Default sorting option
         loaded: true,
+        dateSelector: "",
       };
     },
     methods: {
@@ -43,7 +45,7 @@
       getTeeTimes() {
         this.showButton = false;
         this.loaded = false;
-        TeeTimeService.fetchAllTeeTimes()
+        TeeTimeService.fetchAllTeeTimes(this.dateSelector)
           .then((response) => {
             this.teeTimes = [...response.data];
             this.loaded = true;
