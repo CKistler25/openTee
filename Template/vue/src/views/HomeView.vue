@@ -1,10 +1,14 @@
 <template>
   <div>
+  <the-header/>
+  <div>
     
   <!-- <h1>Home</h1> -->
   <div class="list">
     <TeeTimeList />
   </div>
+</div>
+<the-footer />
 </div>
 </template>
 
@@ -12,6 +16,8 @@
 
 
 import TeeTimeList from '../components/TeeTimeList.vue';
+import TheHeader from '../components/TheHeader.vue';
+import TheFooter from '../components/TheFooter.vue';
 
 export default {
   data(){
@@ -20,6 +26,8 @@ export default {
 },
 components:{
   TeeTimeList,
+  TheHeader,
+  TheFooter,
   
 }
 
